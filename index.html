@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gelişmiş Sipariş ve Stok Yönetim Paneli</title>
+  <title>Sipariş Takip Paneli</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
     body { background-color: #f1f5f9; padding: 20px; color: #1e293b; }
@@ -13,7 +13,7 @@
     .stat-card h3 { font-size: 0.8rem; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
     .stat-card p { font-size: 1.4rem; font-weight: bold; color: #0f172a; }
 
-    .main-container { display: grid; grid-template-columns: 480px 1fr; gap: 20px; }
+    .main-container { display: grid; grid-template-columns: 450px 1fr; gap: 20px; }
     .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     h2 { font-size: 1.1rem; margin-bottom: 15px; color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
     
@@ -30,7 +30,6 @@
     .btn:hover { background: #1d4ed8; }
     .btn:disabled { background: #94a3b8; cursor: not-allowed; }
     .btn-secondary { background: #475569; margin-top: 5px; font-size: 0.8rem; padding: 8px; }
-    .btn-secondary:hover { background: #334155; }
 
     .table-toolbar { display: flex; gap: 10px; margin-bottom: 15px; }
     .search-input { flex: 1; }
@@ -42,20 +41,19 @@
     
     .empty-state { text-align: center; padding: 40px 20px; color: #94a3b8; font-style: italic; }
     
-    .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; display: inline-block; margin-bottom: 2px; }
-    .badge-pending { background: #fef3c7; color: #92400e; }
-    .badge-ready { background: #dbeafe; color: #1e40af; }
-    .badge-sold { background: #dcfce7; color: #166534; }
-    .badge-canceled { background: #fee2e2; color: #991b1b; }
+    .badge { padding: 3px 6px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; display: inline-block; }
     .badge-delayed { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
-    .badge-grade { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: bold; }
+    .badge-grade { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+    .badge-staff { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; font-weight: 600; }
 
-    .item-list { list-style: none; padding: 0; margin: 0; }
-    .item-list li { font-size: 0.8rem; color: #334155; border-bottom: 1px dashed #e2e8f0; padding: 6px 0; }
+    /* Ürün Bazlı Liste Stili */
+    .item-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+    .item-table td { border: none; border-bottom: 1px dashed #e2e8f0; padding: 6px 4px; vertical-align: middle; }
+    .item-table tr:last-child td { border-bottom: none; }
     .item-specs { font-size: 0.75rem; color: #64748b; display: block; margin-top: 2px; }
 
-    .status-select { margin-bottom: 4px; font-weight: 600; cursor: pointer; }
-    .cancel-reason-box { background: #fff1f2; color: #9f1239; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; margin-top: 4px; border: 1px dashed #fda4af; }
+    .item-status-select { font-size: 0.75rem; padding: 3px 6px; font-weight: 600; cursor: pointer; border-radius: 4px; }
+    .cancel-reason-text { font-size: 0.72rem; color: #b91c1c; display: block; margin-top: 2px; font-style: italic; }
   </style>
 </head>
 <body>
@@ -154,13 +152,12 @@
               <th>Tarih</th>
               <th>Müşteri</th>
               <th>Personel</th>
-              <th>Sipariş İçeriği & Detaylar</th>
-              <th>Durum / İşlem</th>
+              <th>Ürünler, Detaylar ve Ürün Durumu</th>
             </tr>
           </thead>
           <tbody id="tableBody">
             <tr id="emptyRow">
-              <td colspan="6" class="empty-state">Yükleniyor...</td>
+              <td colspan="5" class="empty-state">Yükleniyor...</td>
             </tr>
           </tbody>
         </table>
@@ -180,14 +177,14 @@
         .then(data => renderOrdersTable(data))
         .catch(err => {
           console.error("Hata:", err);
-          document.getElementById('tableBody').innerHTML = `<tr><td colspan="6" class="empty-state">Henüz kayıt yok veya yüklenemedi.</td></tr>`;
+          document.getElementById('tableBody').innerHTML = `<tr><td colspan="5" class="empty-state">Henüz kayıt yok veya yüklenemedi.</td></tr>`;
         });
     }
 
     function renderOrdersTable(data) {
       const tableBody = document.getElementById('tableBody');
       if (!data || data.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="6" class="empty-state">Henüz kayıtlı bir sipariş bulunmuyor.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="5" class="empty-state">Henüz kayıtlı bir sipariş bulunmuyor.</td></tr>`;
         updateStats(0, 0, 0);
         return;
       }
@@ -202,9 +199,7 @@
             orderId: row.orderId,
             orderDate: row.orderDate,
             customer: row.customer,
-            staff: row.staff || 'Belirtilmedi',
-            status: row.status || 'Hazırlanıyor',
-            cancelReason: row.cancelReason || '',
+            staff: row.staff || row.personel || 'Belirtilmedi',
             note: row.note,
             items: []
           };
@@ -223,39 +218,38 @@
         const isDelayed = diffDays > 5;
         if (isDelayed) delayedOrdersCount++;
 
-        let itemsHtml = '<ul class="item-list">';
+        let itemsHtml = '<table class="item-table">';
         order.items.forEach(item => {
+          const cancelText = item.cancelReason ? `<span class="cancel-reason-text">Nedeni: ${item.cancelReason}</span>` : '';
+          
           itemsHtml += `
-            <li>
-              <strong>• ${item.type} (${item.qty} Adet)</strong> <span class="badge badge-grade">${item.grade}</span>
-              <span class="item-specs">Model: ${item.model} ${item.specs ? '| ' + item.specs : ''}</span>
-            </li>`;
+            <tr>
+              <td style="width: 60%;">
+                <strong>• ${item.type} (${item.qty} Adet)</strong> <span class="badge badge-grade">${item.grade}</span>
+                <span class="item-specs">Model: ${item.model} ${item.specs ? '| ' + item.specs : ''}</span>
+              </td>
+              <td style="width: 40%; text-align: right;">
+                <select class="item-status-select" onchange="handleItemStatusChange(this, ${item.rowIndex})">
+                  <option value="Hazırlanıyor" ${item.status === 'Hazırlanıyor' ? 'selected' : ''}>🟡 Hazırlanıyor</option>
+                  <option value="Sipariş Hazırlandı" ${item.status === 'Sipariş Hazırlandı' ? 'selected' : ''}>🔵 Hazırlandı</option>
+                  <option value="Satış Yapıldı" ${item.status === 'Satış Yapıldı' ? 'selected' : ''}>🟢 Satış Yapıldı</option>
+                  <option value="Satış Yapılmadı" ${item.status === 'Satış Yapılmadı' ? 'selected' : ''}>🔴 İptal / Satılmadı</option>
+                </select>
+                ${cancelText}
+              </td>
+            </tr>`;
         });
-        itemsHtml += '</ul>';
+        itemsHtml += '</table>';
 
-        const delayBadge = isDelayed 
-          ? `<span class="badge badge-delayed">🔴 Gecikti (${diffDays} Gün)</span>` 
-          : `<small style="color: #64748b;">Süre: ${diffDays} Gün</small>`;
-
-        const cancelReasonHtml = order.cancelReason ? `<div class="cancel-reason-box" id="reason-${order.orderId}"><strong>Nedeni:</strong> ${order.cancelReason}</div>` : `<div class="cancel-reason-box" id="reason-${order.orderId}" style="display:none;"></div>`;
+        const delayBadge = isDelayed ? `<br><span class="badge badge-delayed">🔴 Gecikti (${diffDays} Gün)</span>` : '';
 
         html += `
           <tr>
-            <td>#${order.orderId}</td>
+            <td><strong>#${order.orderId}</strong>${delayBadge}</td>
             <td>${formattedDate}</td>
             <td><strong>${order.customer}</strong></td>
-            <td><span class="badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">👤 ${order.staff}</span></td>
+            <td><span class="badge badge-staff">👤 ${order.staff}</span></td>
             <td>${itemsHtml}</td>
-            <td>
-              <select class="status-select" onchange="handleStatusChange(this, '${order.orderId}')">
-                <option value="Hazırlanıyor" ${order.status === 'Hazırlanıyor' ? 'selected' : ''}>Hazırlanıyor</option>
-                <option value="Sipariş Hazırlandı" ${order.status === 'Sipariş Hazırlandı' ? 'selected' : ''}>Sipariş Hazırlandı</option>
-                <option value="Satış Yapıldı" ${order.status === 'Satış Yapıldı' ? 'selected' : ''}>Satış Yapıldı</option>
-                <option value="Satış Yapılmadı" ${order.status === 'Satış Yapılmadı' ? 'selected' : ''}>Satış Yapılmadı</option>
-              </select><br>
-              ${cancelReasonHtml}
-              ${delayBadge}
-            </td>
           </tr>`;
       });
 
@@ -263,21 +257,28 @@
       updateStats(orderList.length, delayedOrdersCount, totalItemsCount);
     }
 
-    function handleStatusChange(selectEl, orderId) {
+    function handleItemStatusChange(selectEl, rowIndex) {
       const selectedStatus = selectEl.value;
-      const reasonBox = document.getElementById(`reason-${orderId}`);
+      let cancelReason = "";
 
       if (selectedStatus === 'Satış Yapılmadı') {
-        const reason = prompt("Satışın yapılmama / iptal edilme nedenini giriniz:");
-        if (reason && reason.trim() !== "") {
-          reasonBox.style.display = 'block';
-          reasonBox.innerHTML = `<strong>Nedeni:</strong> ${reason}`;
-        } else {
-          reasonBox.style.display = 'none';
-        }
-      } else {
-        reasonBox.style.display = 'none';
+        cancelReason = prompt("Bu ürün için satış yapılmama / iptal nedenini giriniz:") || "";
       }
+
+      // İlgili ürün satırını E-Tablo'da anlık güncelle
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: "updateItemStatus",
+          rowIndex: rowIndex,
+          status: selectedStatus,
+          cancelReason: cancelReason
+        })
+      }).then(() => {
+        console.log(`Satır ${rowIndex} E-Tablo'da güncellendi.`);
+      }).catch(err => console.error("Güncelleme hatası:", err));
     }
 
     function updateStats(totalOrders, delayedOrders, totalItems) {
