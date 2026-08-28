@@ -3,57 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EFS Sipariş ve Stok Yönetim Paneli</title>
+  <title>Gelişmiş Sipariş ve Stok Yönetim Paneli</title>
   <style>
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-    body { background-color: #f8fafc; padding: 12px; color: #1e293b; }
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+    body { background-color: #f1f5f9; padding: 20px; color: #1e293b; }
     
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px; }
-    .stat-card { background: #fff; padding: 12px 15px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 4px solid #2563eb; }
-    .stat-card h3 { font-size: 0.75rem; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
-    .stat-card p { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .stat-card { background: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 4px solid #2563eb; }
+    .stat-card h3 { font-size: 0.8rem; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
+    .stat-card p { font-size: 1.4rem; font-weight: bold; color: #0f172a; }
 
-    .main-container { display: grid; grid-template-columns: 1fr; gap: 15px; }
-    @media (min-width: 992px) {
-      .main-container { grid-template-columns: 460px 1fr; }
-    }
-
-    .card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; }
-    h2 { font-size: 1.05rem; margin-bottom: 12px; color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+    .main-container { display: grid; grid-template-columns: 480px 1fr; gap: 20px; }
+    .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    h2 { font-size: 1.1rem; margin-bottom: 15px; color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
     
     .form-group { margin-bottom: 12px; }
-    label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: #475569; }
-    input, select, textarea { width: 100%; padding: 9px 11px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; background: #fff; -webkit-appearance: none; }
-    select { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 10px center; background-size: 1em; padding-right: 30px; }
+    label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
+    input, select, textarea { width: 100%; padding: 7px 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem; background: #fff; }
     
-    .product-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-bottom: 10px; position: relative; }
+    .product-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 12px; position: relative; }
     .product-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
     .product-row-full { margin-bottom: 8px; }
-    .btn-remove { position: absolute; right: 8px; top: 8px; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px; padding: 3px 8px; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
+    .btn-remove { position: absolute; right: 8px; top: 8px; background: #ef4444; color: white; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
 
-    .btn { width: 100%; background: #2563eb; color: #fff; border: none; padding: 12px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 8px; touch-action: manipulation; }
-    .btn:active { transform: scale(0.99); }
+    .btn { width: 100%; background: #2563eb; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+    .btn:hover { background: #1d4ed8; }
     .btn:disabled { background: #94a3b8; cursor: not-allowed; }
-    .btn-secondary { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; margin-top: 4px; font-size: 0.85rem; padding: 9px; }
+    .btn-secondary { background: #475569; margin-top: 5px; font-size: 0.8rem; padding: 8px; }
+    .btn-secondary:hover { background: #334155; }
 
-    .search-input { margin-bottom: 12px; }
+    .table-toolbar { display: flex; gap: 10px; margin-bottom: 15px; }
+    .search-input { flex: 1; }
 
-    .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 500px; }
-    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
     th { background-color: #f8fafc; color: #475569; font-weight: 600; }
+    tr:hover { background-color: #f8fafc; }
     
-    .empty-state { text-align: center; padding: 30px 10px; color: #94a3b8; font-style: italic; }
+    .empty-state { text-align: center; padding: 40px 20px; color: #94a3b8; font-style: italic; }
     
-    .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; display: inline-block; margin-bottom: 3px; }
-    .badge-pending { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; display: inline-block; margin-bottom: 2px; }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-ready { background: #dbeafe; color: #1e40af; }
+    .badge-sold { background: #dcfce7; color: #166534; }
+    .badge-canceled { background: #fee2e2; color: #991b1b; }
     .badge-delayed { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
-    .badge-grade { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+    .badge-grade { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: bold; }
 
     .item-list { list-style: none; padding: 0; margin: 0; }
-    .item-list li { font-size: 0.82rem; color: #334155; border-bottom: 1px dashed #e2e8f0; padding: 6px 0; }
-    .item-list li:last-child { border-bottom: none; }
+    .item-list li { font-size: 0.8rem; color: #334155; border-bottom: 1px dashed #e2e8f0; padding: 6px 0; }
     .item-specs { font-size: 0.75rem; color: #64748b; display: block; margin-top: 2px; }
+
+    .status-select { margin-bottom: 4px; font-weight: 600; cursor: pointer; }
+    .cancel-reason-box { background: #fff1f2; color: #9f1239; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; margin-top: 4px; border: 1px dashed #fda4af; }
   </style>
 </head>
 <body>
@@ -65,12 +67,12 @@
       <p id="stat-total-orders">0</p>
     </div>
     <div class="stat-card" style="border-color: #dc2626;">
-      <h3>Geciken (>2 Gün)</h3>
+      <h3>Geciken Siparişler (>5 Gün)</h3>
       <p id="stat-delayed-orders">0</p>
     </div>
     <div class="stat-card" style="border-color: #16a34a;">
-      <h3>Toplam Kalem</h3>
-      <p id="stat-total-items">0 Adet</p>
+      <h3>Toplam Kalem Ürün</h3>
+      <p id="stat-total-items">0 Parça</p>
     </div>
   </div>
 
@@ -91,10 +93,20 @@
         </div>
 
         <div class="form-group">
+          <label for="staff">İlgili Personel</label>
+          <select id="staff" required>
+            <option value="">Personel Seçiniz...</option>
+            <option value="Ahmet K.">Ahmet K.</option>
+            <option value="Mehmet T.">Mehmet T.</option>
+            <option value="Ayşe Y.">Ayşe Y.</option>
+          </select>
+        </div>
+
+        <div class="form-group">
           <label>Sipariş Edilen Ürünler</label>
           <div id="productContainer">
             <div class="product-box">
-              <button type="button" class="btn-remove" onclick="removeBox(this)">Kaldır</button>
+              <button type="button" class="btn-remove" onclick="this.parentElement.remove()">Kaldır</button>
               <div class="product-row">
                 <select class="prod-type" onchange="renderDynamicFields(this)" required>
                   <option value="">Ürün Seçiniz...</option>
@@ -102,28 +114,22 @@
                   <option value="Buzdolabı">Buzdolabı</option>
                   <option value="Çamaşır">Çamaşır Makinesi</option>
                   <option value="Kurutma">Kurutma Makinesi</option>
-                  <option value="Bulaşık">Bulaşık Makinesi</option>
-                  <option value="Derin Dondurucu">Derin Dondurucu</option>
-                  <option value="Ankastre Set">Ankastre Set</option>
-                  <option value="Klima">Klima</option>
-                  <option value="Fırın / Mikrodalga">Fırın / Mikrodalga</option>
-                  <option value="Diğer">Diğer / Küçük Ev Aleti</option>
+                  <option value="Diğer">Diğer (Bulaşık, Klima vb.)</option>
                 </select>
                 <select class="prod-grade" required>
-                  <option value="Sıfır (A-Grade / Orjinal)">Sıfır (A-Grade / Orjinal)</option>
-                  <option value="B1 Grade (Ambalaj Hasarlı)">B1 Grade (Ambalaj Hasarlı)</option>
-                  <option value="B2 Grade (Ambalaj Hasarlı Teşhir Çizik)">B2 Grade (Ambalaj Hasarlı Teşhir Çizik)</option>
-                  <option value="C1 Grade (Yenilenmiş)">C1 Grade (Yenilenmiş)</option>
-                  <option value="C2 Grade (Yenilenmiş + Hasarlı + Garanti Dışı)">C2 Grade (Yenilenmiş + Hasarlı + Garanti Dışı)</option>
+                  <option value="Sıfır / A-Grade">Kalite: Sıfır (A-Grade)</option>
+                  <option value="B1 Grade">Kalite: B1 Grade</option>
+                  <option value="B2 Grade">Kalite: B2 Grade</option>
+                  <option value="C1 Grade">Kalite: C1 Grade</option>
+                  <option value="C2 Grade">Kalite: C2 Grade</option>
                 </select>
               </div>
               <div class="product-row-full">
-                <input type="text" class="prod-model" placeholder="Model Kodu / Açıklama" required>
+                <input type="text" class="prod-model" placeholder="Model Kodu / Açıklama (Geniş Yazım Alanı)" required>
               </div>
               <div class="dynamic-fields"></div>
-              <div class="product-row-full" style="margin-top: 6px; display: flex; align-items: center; gap: 8px;">
-                <label style="margin: 0; white-space: nowrap;">Adet:</label>
-                <input type="number" class="prod-qty" min="1" value="1" style="width: 90px;" required>
+              <div class="product-row-full" style="margin-top: 6px;">
+                <input type="number" class="prod-qty" min="1" value="1" placeholder="Adet" style="width: 100px;"> Adet
               </div>
             </div>
           </div>
@@ -142,22 +148,24 @@
     <!-- Sipariş Takip Listesi -->
     <div class="card">
       <h2>Sipariş Takip & Detay Listesi</h2>
-      <input type="text" id="searchInput" class="search-input" placeholder="Müşteri, model veya kalite ara..." onkeyup="filterOrders()">
-      
-      <div class="table-wrapper">
+      <div class="table-toolbar">
+        <input type="text" id="searchInput" class="search-input" placeholder="Müşteri, personel, model veya durum ara..." onkeyup="filterOrders()">
+      </div>
+      <div style="overflow-x: auto;">
         <table id="ordersTable">
           <thead>
             <tr>
               <th># Sipariş</th>
               <th>Tarih</th>
               <th>Müşteri</th>
+              <th>Personel</th>
               <th>Sipariş İçeriği & Detaylar</th>
-              <th>Durum</th>
+              <th>Durum / İşlem</th>
             </tr>
           </thead>
           <tbody id="tableBody">
             <tr id="emptyRow">
-              <td colspan="5" class="empty-state">Yükleniyor...</td>
+              <td colspan="6" class="empty-state">Yükleniyor...</td>
             </tr>
           </tbody>
         </table>
@@ -177,14 +185,14 @@
         .then(data => renderOrdersTable(data))
         .catch(err => {
           console.error("Hata:", err);
-          document.getElementById('tableBody').innerHTML = `<tr><td colspan="5" class="empty-state">Henüz kayıt yok veya yüklenemedi.</td></tr>`;
+          document.getElementById('tableBody').innerHTML = `<tr><td colspan="6" class="empty-state">Henüz kayıt yok veya yüklenemedi.</td></tr>`;
         });
     }
 
     function renderOrdersTable(data) {
       const tableBody = document.getElementById('tableBody');
       if (!data || data.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="5" class="empty-state">Henüz kayıtlı bir sipariş bulunmuyor.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="6" class="empty-state">Henüz kayıtlı bir sipariş bulunmuyor.</td></tr>`;
         updateStats(0, 0, 0);
         return;
       }
@@ -199,6 +207,9 @@
             orderId: row.orderId,
             orderDate: row.orderDate,
             customer: row.customer,
+            staff: row.staff || 'Belirtilmedi',
+            status: row.status || 'Hazırlanıyor',
+            cancelReason: row.cancelReason || '',
             note: row.note,
             items: []
           };
@@ -214,8 +225,7 @@
         const orderDateObj = new Date(order.orderDate);
         const formattedDate = isNaN(orderDateObj) ? order.orderDate : orderDateObj.toLocaleDateString('tr-TR');
         const diffDays = isNaN(orderDateObj) ? 0 : Math.floor((new Date() - orderDateObj) / (1000 * 60 * 60 * 24));
-        
-        const isDelayed = diffDays > 2;
+        const isDelayed = diffDays > 5;
         if (isDelayed) delayedOrdersCount++;
 
         let itemsHtml = '<ul class="item-list">';
@@ -232,14 +242,23 @@
           ? `<span class="badge badge-delayed">🔴 Gecikti (${diffDays} Gün)</span>` 
           : `<small style="color: #64748b;">Süre: ${diffDays} Gün</small>`;
 
+        const cancelReasonHtml = order.cancelReason ? `<div class="cancel-reason-box" id="reason-${order.orderId}"><strong>Nedeni:</strong> ${order.cancelReason}</div>` : `<div class="cancel-reason-box" id="reason-${order.orderId}" style="display:none;"></div>`;
+
         html += `
           <tr>
             <td>#${order.orderId}</td>
             <td>${formattedDate}</td>
             <td><strong>${order.customer}</strong></td>
+            <td><span class="badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">👤 ${order.staff}</span></td>
             <td>${itemsHtml}</td>
             <td>
-              <span class="badge badge-pending">Hazırlanıyor</span><br>
+              <select class="status-select" onchange="handleStatusChange(this, '${order.orderId}')">
+                <option value="Hazırlanıyor" ${order.status === 'Hazırlanıyor' ? 'selected' : ''}>Hazırlanıyor</option>
+                <option value="Sipariş Hazırlandı" ${order.status === 'Sipariş Hazırlandı' ? 'selected' : ''}>Sipariş Hazırlandı</option>
+                <option value="Satış Yapıldı" ${order.status === 'Satış Yapıldı' ? 'selected' : ''}>Satış Yapıldı</option>
+                <option value="Satış Yapılmadı" ${order.status === 'Satış Yapılmadı' ? 'selected' : ''}>Satış Yapılmadı</option>
+              </select><br>
+              ${cancelReasonHtml}
               ${delayBadge}
             </td>
           </tr>`;
@@ -249,10 +268,27 @@
       updateStats(orderList.length, delayedOrdersCount, totalItemsCount);
     }
 
+    function handleStatusChange(selectEl, orderId) {
+      const selectedStatus = selectEl.value;
+      const reasonBox = document.getElementById(`reason-${orderId}`);
+
+      if (selectedStatus === 'Satış Yapılmadı') {
+        const reason = prompt("Satışın yapılmama / iptal edilme nedenini giriniz:");
+        if (reason && reason.trim() !== "") {
+          reasonBox.style.display = 'block';
+          reasonBox.innerHTML = `<strong>Nedeni:</strong> ${reason}`;
+        } else {
+          reasonBox.style.display = 'none';
+        }
+      } else {
+        reasonBox.style.display = 'none';
+      }
+    }
+
     function updateStats(totalOrders, delayedOrders, totalItems) {
       document.getElementById('stat-total-orders').innerText = totalOrders;
       document.getElementById('stat-delayed-orders').innerText = delayedOrders;
-      document.getElementById('stat-total-items').innerText = `${totalItems} Adet`;
+      document.getElementById('stat-total-items').innerText = `${totalItems} Parça`;
     }
 
     function renderDynamicFields(selectEl) {
@@ -262,7 +298,7 @@
 
       if (type === 'TV') {
         let inchOptions = '';
-        for (let i = 32; i <= 115; i++) inchOptions += `<option value="${i} inch">${i}" Ekran</option>`;
+        for (let i = 32; i <= 115; i++) inchOptions += `<option value="${i} inch">${i}" Inch</option>`;
         container.innerHTML = `
           <div class="product-row">
             <select class="spec-inch">${inchOptions}</select>
@@ -277,7 +313,7 @@
       } else if (type === 'Buzdolabı') {
         container.innerHTML = `
           <div class="product-row">
-            <input type="text" class="spec-size" placeholder="Hacim / Ölçü">
+            <input type="text" class="spec-size" placeholder="Ölçü (En x Boy x Yükseklik)">
             <select class="spec-color">
               <option value="Beyaz">Renk: Beyaz</option>
               <option value="Gri / Inox">Renk: Gri / Inox</option>
@@ -288,55 +324,15 @@
         container.innerHTML = `
           <div class="product-row">
             <select class="spec-kg">
-              <option value="7 kg">Kapasite: 7 kg</option>
-              <option value="8 kg">Kapasite: 8 kg</option>
-              <option value="9 kg">Kapasite: 9 kg</option>
-              <option value="10 kg">Kapasite: 10 kg</option>
-              <option value="12 kg">Kapasite: 12 kg</option>
+              <option value="7 kg">7 kg</option>
+              <option value="8 kg">8 kg</option>
+              <option value="9 kg">9 kg</option>
+              <option value="10 kg">10 kg</option>
             </select>
             <select class="spec-color">
               <option value="Beyaz">Renk: Beyaz</option>
               <option value="Gri / Inox">Renk: Gri / Inox</option>
-              <option value="Siyah">Renk: Siyah</option>
             </select>
-          </div>`;
-      } else if (type === 'Bulaşık') {
-        container.innerHTML = `
-          <div class="product-row">
-            <select class="spec-program">
-              <option value="3 Programlı">3 Programlı</option>
-              <option value="4 Programlı">4 Programlı</option>
-              <option value="5 Programlı">5 Programlı</option>
-              <option value="6+ Programlı">6+ Programlı</option>
-            </select>
-            <select class="spec-color">
-              <option value="Beyaz">Renk: Beyaz</option>
-              <option value="Inox">Renk: Inox</option>
-              <option value="Siyah">Renk: Siyah</option>
-            </select>
-          </div>`;
-      } else if (type === 'Klima') {
-        container.innerHTML = `
-          <div class="product-row">
-            <select class="spec-btu">
-              <option value="9.000 BTU">9.000 BTU</option>
-              <option value="12.000 BTU">12.000 BTU</option>
-              <option value="18.000 BTU">18.000 BTU</option>
-              <option value="24.000 BTU">24.000 BTU</option>
-            </select>
-            <select class="spec-inverter">
-              <option value="Inverter">Inverter</option>
-              <option value="On/Off">On/Off</option>
-            </select>
-          </div>`;
-      } else if (type === 'Derin Dondurucu') {
-        container.innerHTML = `
-          <div class="product-row">
-            <select class="spec-freeze-type">
-              <option value="Çekmeceli">Çekmeceli</option>
-              <option value="Jokey / Sandık">Jokey / Sandık Tipi</option>
-            </select>
-            <input type="text" class="spec-cap" placeholder="Çekmece / Hacim">
           </div>`;
       }
     }
@@ -346,7 +342,7 @@
       const div = document.createElement('div');
       div.className = 'product-box';
       div.innerHTML = `
-        <button type="button" class="btn-remove" onclick="removeBox(this)">Kaldır</button>
+        <button type="button" class="btn-remove" onclick="this.parentElement.remove()">Kaldır</button>
         <div class="product-row">
           <select class="prod-type" onchange="renderDynamicFields(this)" required>
             <option value="">Ürün Seçiniz...</option>
@@ -354,39 +350,24 @@
             <option value="Buzdolabı">Buzdolabı</option>
             <option value="Çamaşır">Çamaşır Makinesi</option>
             <option value="Kurutma">Kurutma Makinesi</option>
-            <option value="Bulaşık">Bulaşık Makinesi</option>
-            <option value="Derin Dondurucu">Derin Dondurucu</option>
-            <option value="Ankastre Set">Ankastre Set</option>
-            <option value="Klima">Klima</option>
-            <option value="Fırın / Mikrodalga">Fırın / Mikrodalga</option>
-            <option value="Diğer">Diğer / Küçük Ev Aleti</option>
+            <option value="Diğer">Diğer (Bulaşık, Klima vb.)</option>
           </select>
           <select class="prod-grade" required>
-            <option value="Sıfır (A-Grade / Orjinal)">Sıfır (A-Grade / Orjinal)</option>
-            <option value="B1 Grade (Ambalaj Hasarlı)">B1 Grade (Ambalaj Hasarlı)</option>
-            <option value="B2 Grade (Ambalaj Hasarlı Teşhir Çizik)">B2 Grade (Ambalaj Hasarlı Teşhir Çizik)</option>
-            <option value="C1 Grade (Yenilenmiş)">C1 Grade (Yenilenmiş)</option>
-            <option value="C2 Grade (Yenilenmiş + Hasarlı + Garanti Dışı)">C2 Grade (Yenilenmiş + Hasarlı + Garanti Dışı)</option>
+            <option value="Sıfır / A-Grade">Kalite: Sıfır (A-Grade)</option>
+            <option value="B1 Grade">Kalite: B1 Grade</option>
+            <option value="B2 Grade">Kalite: B2 Grade</option>
+            <option value="C1 Grade">Kalite: C1 Grade</option>
+            <option value="C2 Grade">Kalite: C2 Grade</option>
           </select>
         </div>
         <div class="product-row-full">
           <input type="text" class="prod-model" placeholder="Model Kodu / Açıklama" required>
         </div>
         <div class="dynamic-fields"></div>
-        <div class="product-row-full" style="margin-top: 6px; display: flex; align-items: center; gap: 8px;">
-          <label style="margin: 0; white-space: nowrap;">Adet:</label>
-          <input type="number" class="prod-qty" min="1" value="1" style="width: 90px;" required>
+        <div class="product-row-full" style="margin-top: 6px;">
+          <input type="number" class="prod-qty" min="1" value="1" style="width: 100px;"> Adet
         </div>`;
       container.appendChild(div);
-    }
-
-    function removeBox(btn) {
-      const boxes = document.querySelectorAll('.product-box');
-      if (boxes.length > 1) {
-        btn.parentElement.remove();
-      } else {
-        alert("En az bir adet ürün alanı bulunmalıdır.");
-      }
     }
 
     function filterOrders() {
@@ -402,6 +383,7 @@
 
       const customer = document.getElementById('customer').value;
       const orderDate = document.getElementById('orderDate').value;
+      const staff = document.getElementById('staff').value;
       const note = document.getElementById('note').value;
       const productBoxes = document.querySelectorAll('.product-box');
       const items = [];
@@ -420,8 +402,8 @@
         items.push({ type, grade, model, qty, specs: specsArr.join(" | ") });
       });
 
-      const payload = { customer, orderDate, note, items };
-      const btn = e.target.target || e.target.querySelector('button[type="submit"]');
+      const payload = { customer, orderDate, staff, note, items };
+      const btn = e.target.querySelector('button[type="submit"]');
       btn.innerText = "Kaydediliyor...";
       btn.disabled = true;
 
