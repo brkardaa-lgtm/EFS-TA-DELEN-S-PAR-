@@ -110,11 +110,11 @@
                   <option value="Diğer">Diğer / Küçük Ev Aleti</option>
                 </select>
                 <select class="prod-grade" required>
-                  <option value="Sıfır (A-Grade)">Sıfır (A-Grade / Orjinal)</option>
+                  <option value="Sıfır (A-Grade / Orjinal)">Sıfır (A-Grade / Orjinal)</option>
                   <option value="B1 Grade (Ambalaj Hasarlı)">B1 Grade (Ambalaj Hasarlı)</option>
-                  <option value="B2 Grade (Teşhir / Çizikli)">B2 Grade (Teşhir / Çizikli)</option>
-                  <option value="C1 Grade (Revizyonlu)">C1 Grade (Revizyonlu)</option>
-                  <option value="C2 Grade (Yenilenmiş)">C2 Grade (Yenilenmiş)</option>
+                  <option value="B2 Grade (Ambalaj Hasarlı Teşhir Çizik)">B2 Grade (Ambalaj Hasarlı Teşhir Çizik)</option>
+                  <option value="C1 Grade (Yenilenmiş)">C1 Grade (Yenilenmiş)</option>
+                  <option value="C2 Grade (Yenilenmiş + Hasarlı + Garanti Dışı)">C2 Grade (Yenilenmiş + Hasarlı + Garanti Dışı)</option>
                 </select>
               </div>
               <div class="product-row-full">
@@ -215,7 +215,6 @@
         const formattedDate = isNaN(orderDateObj) ? order.orderDate : orderDateObj.toLocaleDateString('tr-TR');
         const diffDays = isNaN(orderDateObj) ? 0 : Math.floor((new Date() - orderDateObj) / (1000 * 60 * 60 * 24));
         
-        // Gecikme süresi 2 GÜN olarak ayarlandı
         const isDelayed = diffDays > 2;
         if (isDelayed) delayedOrdersCount++;
 
@@ -363,11 +362,11 @@
             <option value="Diğer">Diğer / Küçük Ev Aleti</option>
           </select>
           <select class="prod-grade" required>
-            <option value="Sıfır (A-Grade)">Sıfır (A-Grade / Orjinal)</option>
+            <option value="Sıfır (A-Grade / Orjinal)">Sıfır (A-Grade / Orjinal)</option>
             <option value="B1 Grade (Ambalaj Hasarlı)">B1 Grade (Ambalaj Hasarlı)</option>
-            <option value="B2 Grade (Teşhir / Çizikli)">B2 Grade (Teşhir / Çizikli)</option>
-            <option value="C1 Grade (Revizyonlu)">C1 Grade (Revizyonlu)</option>
-            <option value="C2 Grade (Yenilenmiş)">C2 Grade (Yenilenmiş)</option>
+            <option value="B2 Grade (Ambalaj Hasarlı Teşhir Çizik)">B2 Grade (Ambalaj Hasarlı Teşhir Çizik)</option>
+            <option value="C1 Grade (Yenilenmiş)">C1 Grade (Yenilenmiş)</option>
+            <option value="C2 Grade (Yenilenmiş + Hasarlı + Garanti Dışı)">C2 Grade (Yenilenmiş + Hasarlı + Garanti Dışı)</option>
           </select>
         </div>
         <div class="product-row-full">
@@ -422,7 +421,7 @@
       });
 
       const payload = { customer, orderDate, note, items };
-      const btn = e.target.querySelector('button[type="submit"]');
+      const btn = e.target.target || e.target.querySelector('button[type="submit"]');
       btn.innerText = "Kaydediliyor...";
       btn.disabled = true;
 
