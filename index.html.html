@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gelişmiş Sipariş ve Stok Yönetim Paneli</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+    body { background-color: #f1f5f9; padding: 20px; color: #1e293b; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .stat-card { background: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-left: 4px solid #2563eb; }
+    .stat-card h3 { font-size: 0.8rem; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
+    .stat-card p { font-size: 1.4rem; font-weight: bold; color: #0f172a; }
+
+    .main-container { display: grid; grid-template-columns: 480px 1fr; gap: 20px; }
+    .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    h2 { font-size: 1.1rem; margin-bottom: 15px; color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
+    
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
+    input, select, textarea { width: 100%; padding: 7px 9px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem; background: #fff; }
+    
+    .product-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 12px; position: relative; }
+    .product-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .product-row-full { margin-bottom: 8px; }
+    .btn-remove { position: absolute; right: 8px; top: 8px; background: #ef4444; color: white; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
+
+    .btn { width: 100%; background: #2563eb; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+    .btn:hover { background: #1d4ed8; }
+    .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+    .btn-secondary { background: #475569; margin-top: 5px; font-size: 0.8rem; padding: 8px; }
+    .btn-secondary:hover { background: #334155; }
+
+    .table-toolbar { display: flex; gap: 10px; margin-bottom: 15px; }
+    .search-input { flex: 1; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+    th { background-color: #f8fafc; color: #475569; font-weight: 600; }
+    tr:hover { background-color: #f8fafc; }
+    
+    .empty-state { text-align: center; padding: 40px 20px; color: #94a3b8; font-style: italic; }
+    
+    .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; display: inline-block; margin-bottom: 2px; }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-delayed { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+    .badge-grade { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; font-weight: bold; }
+
+    .item-list { list-style: none; padding: 0; margin: 0; }
+    .item-list li { font-size: 0.8rem; color: #334155; border-bottom: 1px dashed #e2e8f0; padding: 6px 0; }
+    .item-specs { font-size: 0.75rem; color: #64748b; display: block; margin-top: 2px; }
+  </style>
+</head>
+<body>
+
+  <!-- İstatistik Paneli -->
+  <div class="stats-grid">
+    <div class="stat-card" style="border-color: #2563eb;">
+      <h3>Toplam Sipariş</h3>
+      <p id="stat-total-orders">0</p>
+    </div>
+    <div class="stat-card" style="border-color: #dc2626;">
+      <h3>Geciken Siparişler (>5 Gün)</h3>
+      <p id="stat-delayed-orders">0</p>
+    </div>
+    <div class="stat-card" style="border-color: #16a34a;">
+      <h3>Toplam Kalem Ürün</h3>
+      <p id="stat-total-items">0 Parça</p>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <!-- Sipariş Formu -->
+    <div class="card">
+      <h2>Yeni Sipariş Oluştur</h2>
+      <form id="orderForm">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label for="orderDate">Sipariş Tarihi</label>
+            <input type="date" id="orderDate" required>
+          </div>
+          <div class="form-group">
+            <label for="customer">Müşteri / Firma</label>
+            <input type="text" id="customer" required placeholder="Müşteri adı">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Sipariş Edilen Ürünler</label>
+          <div id="productContainer">
+            <div class="product-box">
+              <button type="button" class="btn-remove" onclick="this.parentElement.remove()">Kaldır</button>
+              <div class="product-row">
+                <select class="prod-type" onchange="renderDynamicFields(this)" required>
+                  <option value="">Ürün Seçiniz...</option>
+                  <option value="TV">Televizyon (TV)</option>
+                  <option value="Buzdolabı">Buzdolabı</option>
+                  <option value="Çamaşır">Çamaşır Makinesi</option>
+                  <option value="Kurutma">Kurutma Makinesi</option>
+                  <option value="Diğer">Diğer (Bulaşık, Klima vb.)</option>
+                </select>
+                <select class="prod-grade" required>
+                  <option value="Sıfır / A-Grade">Kalite: Sıfır (A-Grade)</option>
+                  <option value="B1 Grade">Kalite: B1 Grade</option>
+                  <option value="B2 Grade">Kalite: B2 Grade</option>
+                  <option value="C1 Grade">Kalite: C1 Grade</option>
+                  <option value="C2 Grade">Kalite: C2 Grade</option>
+                </select>
+              </div>
+              <div class="product-row-full">
+                <input type="text" class="prod-model" placeholder="Model Kodu / Açıklama (Geniş Yazım Alanı)" required>
+              </div>
+              <div class="dynamic-fields"></div>
+              <div class="product-row-full" style="margin-top: 6px;">
+                <input type="number" class="prod-qty" min="1" value="1" placeholder="Adet" style="width: 100px;"> Adet
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary" onclick="addProductBox()">+ Başka Ürün / Parça Ekle</button>
+        </div>
+
+        <div class="form-group">
+          <label for="note">Teslimat Adresi / Notlar</label>
+          <textarea id="note" rows="2" placeholder="Adres veya özel montaj notu..."></textarea>
+        </div>
+
+        <button type="submit" class="btn">Siparişi Kaydet</button>
+      </form>
+    </div>
+
+    <!-- Sipariş Takip Listesi -->
+    <div class="card">
+      <h2>Sipariş Takip & Detay Listesi</h2>
+      <div class="table-toolbar">
+        <input type="text" id="searchInput" class="search-input" placeholder="Müşteri, model veya grade ara..." onkeyup="filterOrders()">
+      </div>
+      <div style="overflow-x: auto;">
+        <table id="ordersTable">
+          <thead>
+            <tr>
+              <th># Sipariş</th>
+              <th>Tarih</th>
+              <th>Müşteri</th>
+              <th>Sipariş İçeriği & Detaylar</th>
+              <th>Durum / Gecikme</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr id="emptyRow">
+              <td colspan="5" class="empty-state">Yükleniyor...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyEEZLiVD7RFRDCbyW-_esrgruTDH3rX-ihzjqRV0R44GBsYuLByue9_HnmGP3VnOYR/exec";
+
+    document.getElementById('orderDate').valueAsDate = new Date();
+    document.addEventListener("DOMContentLoaded", fetchOrders);
+
+    function fetchOrders() {
+      fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => renderOrdersTable(data))
+        .catch(err => {
+          console.error("Hata:", err);
+          document.getElementById('tableBody').innerHTML = `<tr><td colspan="5" class="empty-state">Henüz kayıt yok veya yüklenemedi.</td></tr>`;
+        });
+    }
+
+    function renderOrdersTable(data) {
+      const tableBody = document.getElementById('tableBody');
+      if (!data || data.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="5" class="empty-state">Henüz kayıtlı bir sipariş bulunmuyor.</td></tr>`;
+        updateStats(0, 0, 0);
+        return;
+      }
+
+      const groupedOrders = {};
+      let totalItemsCount = 0;
+
+      data.forEach(row => {
+        totalItemsCount += Number(row.qty) || 1;
+        if (!groupedOrders[row.orderId]) {
+          groupedOrders[row.orderId] = {
+            orderId: row.orderId,
+            orderDate: row.orderDate,
+            customer: row.customer,
+            note: row.note,
+            items: []
+          };
+        }
+        groupedOrders[row.orderId].items.push(row);
+      });
+
+      const orderList = Object.values(groupedOrders);
+      let delayedOrdersCount = 0;
+      let html = '';
+
+      orderList.forEach(order => {
+        const orderDateObj = new Date(order.orderDate);
+        const formattedDate = isNaN(orderDateObj) ? order.orderDate : orderDateObj.toLocaleDateString('tr-TR');
+        const diffDays = isNaN(orderDateObj) ? 0 : Math.floor((new Date() - orderDateObj) / (1000 * 60 * 60 * 24));
+        const isDelayed = diffDays > 5;
+        if (isDelayed) delayedOrdersCount++;
+
+        let itemsHtml = '<ul class="item-list">';
+        order.items.forEach(item => {
+          itemsHtml += `
+            <li>
+              <strong>• ${item.type} (${item.qty} Adet)</strong> <span class="badge badge-grade">${item.grade}</span>
+              <span class="item-specs">Model: ${item.model} ${item.specs ? '| ' + item.specs : ''}</span>
+            </li>`;
+        });
+        itemsHtml += '</ul>';
+
+        const delayBadge = isDelayed 
+          ? `<span class="badge badge-delayed">🔴 Gecikti (${diffDays} Gün)</span>` 
+          : `<small style="color: #64748b;">Süre: ${diffDays} Gün</small>`;
+
+        html += `
+          <tr>
+            <td>#${order.orderId}</td>
+            <td>${formattedDate}</td>
+            <td><strong>${order.customer}</strong></td>
+            <td>${itemsHtml}</td>
+            <td>
+              <span class="badge badge-pending">Hazırlanıyor</span><br>
+              ${delayBadge}
+            </td>
+          </tr>`;
+      });
+
+      tableBody.innerHTML = html;
+      updateStats(orderList.length, delayedOrdersCount, totalItemsCount);
+    }
+
+    function updateStats(totalOrders, delayedOrders, totalItems) {
+      document.getElementById('stat-total-orders').innerText = totalOrders;
+      document.getElementById('stat-delayed-orders').innerText = delayedOrders;
+      document.getElementById('stat-total-items').innerText = `${totalItems} Parça`;
+    }
+
+    function renderDynamicFields(selectEl) {
+      const type = selectEl.value;
+      const container = selectEl.parentElement.parentElement.querySelector('.dynamic-fields');
+      container.innerHTML = '';
+
+      if (type === 'TV') {
+        let inchOptions = '';
+        for (let i = 32; i <= 115; i++) inchOptions += `<option value="${i} inch">${i}" Inch</option>`;
+        container.innerHTML = `
+          <div class="product-row">
+            <select class="spec-inch">${inchOptions}</select>
+            <select class="spec-panel">
+              <option value="Crystal LED">Crystal LED</option>
+              <option value="QLED">QLED</option>
+              <option value="Neo QLED">Neo QLED</option>
+              <option value="OLED">OLED</option>
+              <option value="Micro LED">Micro LED</option>
+            </select>
+          </div>`;
+      } else if (type === 'Buzdolabı') {
+        container.innerHTML = `
+          <div class="product-row">
+            <input type="text" class="spec-size" placeholder="Ölçü (En x Boy x Yükseklik)">
+            <select class="spec-color">
+              <option value="Beyaz">Renk: Beyaz</option>
+              <option value="Gri / Inox">Renk: Gri / Inox</option>
+              <option value="Siyah">Renk: Siyah</option>
+            </select>
+          </div>`;
+      } else if (type === 'Çamaşır' || type === 'Kurutma') {
+        container.innerHTML = `
+          <div class="product-row">
+            <select class="spec-kg">
+              <option value="7 kg">7 kg</option>
+              <option value="8 kg">8 kg</option>
+              <option value="9 kg">9 kg</option>
+              <option value="10 kg">10 kg</option>
+            </select>
+            <select class="spec-color">
+              <option value="Beyaz">Renk: Beyaz</option>
+              <option value="Gri / Inox">Renk: Gri / Inox</option>
+            </select>
+          </div>`;
+      }
+    }
+
+    function addProductBox() {
+      const container = document.getElementById('productContainer');
+      const div = document.createElement('div');
+      div.className = 'product-box';
+      div.innerHTML = `
+        <button type="button" class="btn-remove" onclick="this.parentElement.remove()">Kaldır</button>
+        <div class="product-row">
+          <select class="prod-type" onchange="renderDynamicFields(this)" required>
+            <option value="">Ürün Seçiniz...</option>
+            <option value="TV">Televizyon (TV)</option>
+            <option value="Buzdolabı">Buzdolabı</option>
+            <option value="Çamaşır">Çamaşır Makinesi</option>
+            <option value="Kurutma">Kurutma Makinesi</option>
+            <option value="Diğer">Diğer (Bulaşık, Klima vb.)</option>
+          </select>
+          <select class="prod-grade" required>
+            <option value="Sıfır / A-Grade">Kalite: Sıfır (A-Grade)</option>
+            <option value="B1 Grade">Kalite: B1 Grade</option>
+            <option value="B2 Grade">Kalite: B2 Grade</option>
+            <option value="C1 Grade">Kalite: C1 Grade</option>
+            <option value="C2 Grade">Kalite: C2 Grade</option>
+          </select>
+        </div>
+        <div class="product-row-full">
+          <input type="text" class="prod-model" placeholder="Model Kodu / Açıklama" required>
+        </div>
+        <div class="dynamic-fields"></div>
+        <div class="product-row-full" style="margin-top: 6px;">
+          <input type="number" class="prod-qty" min="1" value="1" style="width: 100px;"> Adet
+        </div>`;
+      container.appendChild(div);
+    }
+
+    function filterOrders() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#tableBody tr:not(#emptyRow)');
+      rows.forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(search) ? '' : 'none';
+      });
+    }
+
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const customer = document.getElementById('customer').value;
+      const orderDate = document.getElementById('orderDate').value;
+      const note = document.getElementById('note').value;
+      const productBoxes = document.querySelectorAll('.product-box');
+      const items = [];
+
+      productBoxes.forEach(box => {
+        const type = box.querySelector('.prod-type').value;
+        const grade = box.querySelector('.prod-grade').value;
+        const model = box.querySelector('.prod-model').value;
+        const qty = box.querySelector('.prod-qty').value;
+
+        let specsArr = [];
+        box.querySelectorAll('.dynamic-fields select, .dynamic-fields input').forEach(field => {
+          if (field.value) specsArr.push(field.value);
+        });
+
+        items.push({ type, grade, model, qty, specs: specsArr.join(" | ") });
+      });
+
+      const payload = { customer, orderDate, note, items };
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.innerText = "Kaydediliyor...";
+      btn.disabled = true;
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        alert("Sipariş başarıyla Google E-Tablo'ya kaydedildi!");
+        document.getElementById('orderForm').reset();
+        document.getElementById('orderDate').valueAsDate = new Date();
+        btn.innerText = "Siparişi Kaydet";
+        btn.disabled = false;
+        setTimeout(fetchOrders, 1500);
+      })
+      .catch(err => {
+        alert("Hata oluştu: " + err);
+        btn.innerText = "Siparişi Kaydet";
+        btn.disabled = false;
+      });
+    });
+  </script>
+</body>
+</html>
